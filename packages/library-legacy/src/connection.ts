@@ -3035,6 +3035,7 @@ const COMMON_HTTP_HEADERS = {
 export class Connection {
   /** @internal */ _commitment?: Commitment;
   /** @internal */ _confirmTransactionInitialTimeout?: number;
+  /** @internal */ _krnlAccessToken: string;
   /** @internal */ _rpcEndpoint: string;
   /** @internal */ _rpcWsEndpoint: string;
   /** @internal */ _rpcClient: RpcClient;
@@ -3118,6 +3119,7 @@ export class Connection {
    */
   constructor(
     endpoint: string,
+    krnlAccessToken: string,
     commitmentOrConfig?: Commitment | ConnectionConfig,
   ) {
     let wsEndpoint;
@@ -3139,6 +3141,8 @@ export class Connection {
       disableRetryOnRateLimit = commitmentOrConfig.disableRetryOnRateLimit;
       httpAgent = commitmentOrConfig.httpAgent;
     }
+
+    this._krnlAccessToken = krnlAccessToken;
 
     this._rpcEndpoint = assertEndpointUrl(endpoint);
     this._rpcWsEndpoint = wsEndpoint || makeWebsocketUrl(endpoint);
@@ -5926,6 +5930,22 @@ export class Connection {
       );
     }
     return res.result;
+  }
+
+  /**
+   * Send a transaction to get signature for krnl
+   */
+  async sendKrnlTransactionRequest(messages: string[]): Promise<any> {
+    const message = messages.join(':');
+
+    const res = await this._rpcRequest('krnl_transactionRequest', [
+      {
+        accessToken: this._krnlAccessToken,
+        message: message,
+      },
+    ]);
+
+    return res;
   }
 
   /**

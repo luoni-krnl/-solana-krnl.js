@@ -33,6 +33,14 @@ export const enum TransactionStatus {
 }
 
 /**
+ * The response for the krnl_transactionRequest rpc call
+ */
+export type KrnlTxRequestResponse = {
+  signatureToken: string;
+  hash: string;
+}
+
+/**
  * Default (empty) signature
  */
 const DEFAULT_SIGNATURE = Buffer.alloc(SIGNATURE_LENGTH_IN_BYTES).fill(0);
