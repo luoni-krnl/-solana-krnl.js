@@ -3035,7 +3035,7 @@ const COMMON_HTTP_HEADERS = {
 export class Connection {
   /** @internal */ _commitment?: Commitment;
   /** @internal */ _confirmTransactionInitialTimeout?: number;
-  /** @internal */ _krnlAccessToken: string;
+  /** @internal */ _krnlAccessToken?: string;
   /** @internal */ _rpcEndpoint: string;
   /** @internal */ _rpcWsEndpoint: string;
   /** @internal */ _rpcClient: RpcClient;
@@ -3119,8 +3119,8 @@ export class Connection {
    */
   constructor(
     endpoint: string,
-    krnlAccessToken: string,
     commitmentOrConfig?: Commitment | ConnectionConfig,
+    krnlAccessToken?: string,
   ) {
     let wsEndpoint;
     let httpHeaders;
@@ -3142,7 +3142,9 @@ export class Connection {
       httpAgent = commitmentOrConfig.httpAgent;
     }
 
-    this._krnlAccessToken = krnlAccessToken;
+    if (krnlAccessToken) {
+      this._krnlAccessToken = krnlAccessToken;
+    }
 
     this._rpcEndpoint = assertEndpointUrl(endpoint);
     this._rpcWsEndpoint = wsEndpoint || makeWebsocketUrl(endpoint);
@@ -5938,6 +5940,10 @@ export class Connection {
   async sendKrnlTransactionRequest(
     messages: string[],
   ): Promise<KrnlTxRequestResponse> {
+    if (!this._krnlAccessToken) {
+      throw new Error('Krnl access token not provided');
+    }
+
     const message = messages.join(':');
 
     const res = await this._rpcRequest('krnl_transactionRequest', [
