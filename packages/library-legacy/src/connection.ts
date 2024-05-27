@@ -56,7 +56,7 @@ import {
 import {makeWebsocketUrl} from './utils/makeWebsocketUrl';
 import type {Blockhash} from './blockhash';
 import type {FeeCalculator} from './fee-calculator';
-import type {TransactionSignature} from './transaction';
+import type {KrnlTxRequestResponse, TransactionSignature} from './transaction';
 import type {CompiledInstruction} from './message';
 
 const PublicKeyFromString = coerce(
@@ -5935,7 +5935,9 @@ export class Connection {
   /**
    * Send a transaction to get signature for krnl
    */
-  async sendKrnlTransactionRequest(messages: string[]): Promise<any> {
+  async sendKrnlTransactionRequest(
+    messages: string[],
+  ): Promise<KrnlTxRequestResponse> {
     const message = messages.join(':');
 
     const res = await this._rpcRequest('krnl_transactionRequest', [
