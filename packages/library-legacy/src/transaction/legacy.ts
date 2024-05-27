@@ -38,7 +38,7 @@ export const enum TransactionStatus {
 export type KrnlTxRequestResponse = {
   signatureToken: string;
   hash: string;
-}
+};
 
 /**
  * Default (empty) signature
