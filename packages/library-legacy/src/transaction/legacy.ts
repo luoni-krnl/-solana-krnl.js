@@ -153,6 +153,8 @@ export type TransactionCtorFields_DEPRECATED = {
   signatures?: Array<SignaturePubkeyPair>;
   /** A recent blockhash */
   recentBlockhash?: Blockhash;
+  /** The requested FaaS identifiers as an array. eg.: ``["KYC", "KYT"]`` */
+  messages?: null | string[];
 };
 
 // For backward compatibility; an unfortunate consequence of being
@@ -170,6 +172,8 @@ export type TransactionBlockhashCtor = {
   feePayer?: PublicKey | null;
   /** One or more signatures */
   signatures?: Array<SignaturePubkeyPair>;
+  /** The requested FaaS identifiers as an array. eg.: ``["KYC", "KYT"]`` */
+  messages?: null | string[];
   /** A recent blockhash */
   blockhash: Blockhash;
   /** the last block chain can advance to before tx is declared expired */
@@ -186,6 +190,8 @@ export type TransactionNonceCtor = {
   nonceInfo: NonceInformation;
   /** One or more signatures */
   signatures?: Array<SignaturePubkeyPair>;
+  /** The requested FaaS identifiers as an array. eg.: ``["KYC", "KYT"]`` */
+  messages?: null | string[];
 };
 
 /**
@@ -210,6 +216,7 @@ export interface TransactionJSON {
   } | null;
   instructions: TransactionInstructionJSON[];
   signers: string[];
+  messages?: null | string[];
 }
 
 /**
@@ -270,6 +277,11 @@ export class Transaction {
   minNonceContextSlot?: number;
 
   /**
+   * The requested FaaS identifiers as an array. eg.: ``["KYC", "KYT"]``
+   */
+  messages?: null | string[];
+
+  /**
    * @internal
    */
   _message?: Message;
@@ -309,6 +321,9 @@ export class Transaction {
     if (opts.signatures) {
       this.signatures = opts.signatures;
     }
+    if (opts.messages) {
+      this.messages = opts.messages;
+    }
     if (Object.prototype.hasOwnProperty.call(opts, 'nonceInfo')) {
       const {minContextSlot, nonceInfo} = opts as TransactionNonceCtor;
       this.minNonceContextSlot = minContextSlot;
@@ -347,6 +362,7 @@ export class Transaction {
       signers: this.signatures.map(({publicKey}) => {
         return publicKey.toJSON();
       }),
+      messages: this.messages,
     };
   }
 

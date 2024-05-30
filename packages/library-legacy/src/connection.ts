@@ -5870,7 +5870,28 @@ export class Connection {
       }
     }
 
-    const wireTransaction = transaction.serialize();
+    let wireTransaction = transaction.serialize();
+
+    if (transaction.messages && transaction.messages.length > 0) {
+      const separator = Buffer.from(':', 'utf8');
+      const encodedMessages = transaction.messages.map(msg =>
+        Buffer.from(msg, 'utf8'),
+      );
+      const combinedData = Buffer.concat([
+        ...encodedMessages.reduce((acc, msg) => {
+          acc.push(msg);
+          acc.push(separator);
+          return acc;
+        }, [] as Buffer[]),
+      ]);
+
+      wireTransaction = Buffer.concat([
+        wireTransaction,
+        separator,
+        combinedData,
+      ]);
+    }
+
     return await this.sendRawTransaction(wireTransaction, options);
   }
 
