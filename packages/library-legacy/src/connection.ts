@@ -5879,17 +5879,13 @@ export class Connection {
       );
       const combinedData = Buffer.concat([
         ...encodedMessages.reduce((acc, msg) => {
-          acc.push(msg);
           acc.push(separator);
+          acc.push(msg);
           return acc;
         }, [] as Buffer[]),
       ]);
 
-      wireTransaction = Buffer.concat([
-        wireTransaction,
-        separator,
-        combinedData,
-      ]);
+      wireTransaction = Buffer.concat([wireTransaction, combinedData]);
     }
 
     return await this.sendRawTransaction(wireTransaction, options);
