@@ -3120,7 +3120,7 @@ export class Connection {
   constructor(
     endpoint: string,
     commitmentOrConfig?: Commitment | ConnectionConfig,
-    krnlAccessToken?: string,
+    krnlAccessToken?: null | string,
   ) {
     let wsEndpoint;
     let httpHeaders;

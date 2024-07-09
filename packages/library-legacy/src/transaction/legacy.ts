@@ -153,8 +153,6 @@ export type TransactionCtorFields_DEPRECATED = {
   signatures?: Array<SignaturePubkeyPair>;
   /** A recent blockhash */
   recentBlockhash?: Blockhash;
-  /** The requested FaaS identifiers as an array. eg.: ``["KYC", "KYT"]`` */
-  messages?: null | string[];
 };
 
 // For backward compatibility; an unfortunate consequence of being
@@ -172,8 +170,6 @@ export type TransactionBlockhashCtor = {
   feePayer?: PublicKey | null;
   /** One or more signatures */
   signatures?: Array<SignaturePubkeyPair>;
-  /** The requested FaaS identifiers as an array. eg.: ``["KYC", "KYT"]`` */
-  messages?: null | string[];
   /** A recent blockhash */
   blockhash: Blockhash;
   /** the last block chain can advance to before tx is declared expired */
@@ -190,8 +186,6 @@ export type TransactionNonceCtor = {
   nonceInfo: NonceInformation;
   /** One or more signatures */
   signatures?: Array<SignaturePubkeyPair>;
-  /** The requested FaaS identifiers as an array. eg.: ``["KYC", "KYT"]`` */
-  messages?: null | string[];
 };
 
 /**
@@ -216,7 +210,6 @@ export interface TransactionJSON {
   } | null;
   instructions: TransactionInstructionJSON[];
   signers: string[];
-  messages?: null | string[];
 }
 
 /**
@@ -292,16 +285,19 @@ export class Transaction {
   _json?: TransactionJSON;
 
   // Construct a transaction with a blockhash and lastValidBlockHeight
-  constructor(opts?: TransactionBlockhashCtor);
+  constructor(opts?: TransactionBlockhashCtor, messages?: null | string[]);
 
   // Construct a transaction using a durable nonce
-  constructor(opts?: TransactionNonceCtor);
+  constructor(opts?: TransactionNonceCtor, messages?: null | string[]);
 
   /**
    * @deprecated `TransactionCtorFields` has been deprecated and will be removed in a future version.
    * Please supply a `TransactionBlockhashCtor` instead.
    */
-  constructor(opts?: TransactionCtorFields_DEPRECATED);
+  constructor(
+    opts?: TransactionCtorFields_DEPRECATED,
+    messages?: null | string[],
+  );
 
   /**
    * Construct an empty Transaction
@@ -311,6 +307,7 @@ export class Transaction {
       | TransactionBlockhashCtor
       | TransactionNonceCtor
       | TransactionCtorFields_DEPRECATED,
+    messages?: null | string[],
   ) {
     if (!opts) {
       return;
@@ -321,8 +318,8 @@ export class Transaction {
     if (opts.signatures) {
       this.signatures = opts.signatures;
     }
-    if (opts.messages) {
-      this.messages = opts.messages;
+    if (messages) {
+      this.messages = messages;
     }
     if (Object.prototype.hasOwnProperty.call(opts, 'nonceInfo')) {
       const {minContextSlot, nonceInfo} = opts as TransactionNonceCtor;
@@ -362,7 +359,6 @@ export class Transaction {
       signers: this.signatures.map(({publicKey}) => {
         return publicKey.toJSON();
       }),
-      messages: this.messages,
     };
   }
 
